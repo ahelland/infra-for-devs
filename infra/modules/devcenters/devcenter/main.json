@@ -1,0 +1,143 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.24.24.22086",
+      "templateHash": "12216208608681701211"
+    },
+    "name": "Dev Center",
+    "description": "Dev Center",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for resources."
+      }
+    },
+    "devCenterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of DevCenter"
+      }
+    },
+    "networkConnectionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Network connection id for the network the Dev Center should be attached to."
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "image": {
+      "type": "string",
+      "metadata": {
+        "description": "DevBox definition image id."
+      }
+    },
+    "definitionName": {
+      "type": "string",
+      "defaultValue": "DevBox-8-32",
+      "metadata": {
+        "description": "Name of DevBox definition."
+      }
+    },
+    "definitionSKU": {
+      "type": "string",
+      "defaultValue": "general_i_8c32gb256ssd_v2",
+      "metadata": {
+        "description": "DevBox definition SKU."
+      }
+    },
+    "definitionStorageType": {
+      "type": "string",
+      "defaultValue": "ssd_256gb",
+      "metadata": {
+        "description": "DevBox definition storage type."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DevCenter/devcenters",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[parameters('devCenterName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.DevCenter/devcenters/environmentTypes",
+      "apiVersion": "2023-04-01",
+      "name": "[format('{0}/{1}', parameters('devCenterName'), 'dev')]",
+      "properties": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DevCenter/devcenters/attachednetworks",
+      "apiVersion": "2023-04-01",
+      "name": "[format('{0}/{1}', parameters('devCenterName'), format('{0}-network', parameters('devCenterName')))]",
+      "properties": {
+        "networkConnectionId": "[parameters('networkConnectionId')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DevCenter/devcenters/devboxdefinitions",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('devCenterName'), parameters('definitionName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "imageReference": {
+          "id": "[format('{0}/galleries/default/images/{1}', resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName')), parameters('image'))]"
+        },
+        "sku": {
+          "name": "[parameters('definitionSKU')]"
+        },
+        "osStorageType": "[parameters('definitionStorageType')]",
+        "hibernateSupport": "Enabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "devCenterId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of DevCenter."
+      },
+      "value": "[resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName'))]"
+    },
+    "devCenterAttachedNetwork": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the attached network."
+      },
+      "value": "[format('{0}-network', parameters('devCenterName'))]"
+    },
+    "devCenterManagedId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of the system-managed identity of the Dev Center."
+      },
+      "value": "[reference(resourceId('Microsoft.DevCenter/devcenters', parameters('devCenterName')), '2023-10-01-preview', 'full').identity.principalId]"
+    }
+  }
+}

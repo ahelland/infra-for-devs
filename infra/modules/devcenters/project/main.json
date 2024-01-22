@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.24.24.22086",
+      "templateHash": "4477649450652903695"
+    },
+    "name": "Dev Box Project",
+    "description": "Dev Box Project with Pool.",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for resources."
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "devCenterId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of the DevCenter to attach project to."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of project."
+      }
+    },
+    "devPoolName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of DevBox pool."
+      }
+    },
+    "networkConnectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of network connection to attach to."
+      }
+    },
+    "devBoxDefinitionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of DevBox definition."
+      }
+    },
+    "licenseType": {
+      "type": "string",
+      "defaultValue": "Windows_Client",
+      "metadata": {
+        "description": "License Type of DevBox."
+      }
+    },
+    "localAdministrator": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "metadata": {
+        "description": "Status of local admin account."
+      }
+    },
+    "deploymentTargetId": {
+      "type": "string",
+      "metadata": {
+        "description": "SubscriptionId the environment will be mapped to."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DevCenter/projects",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[parameters('projectName')]",
+      "tags": "[parameters('resourceTags')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "devCenterId": "[parameters('devCenterId')]"
+      }
+    },
+    {
+      "type": "Microsoft.DevCenter/projects/environmentTypes",
+      "apiVersion": "2023-04-01",
+      "name": "[format('{0}/{1}', parameters('projectName'), 'dev')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "deploymentTargetId": "[parameters('deploymentTargetId')]",
+        "status": "Enabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DevCenter/projects', parameters('projectName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DevCenter/projects/pools",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('projectName'), parameters('devPoolName'))]",
+      "tags": "[parameters('resourceTags')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "devBoxDefinitionName": "[parameters('devBoxDefinitionName')]",
+        "networkConnectionName": "[parameters('networkConnectionName')]",
+        "licenseType": "[parameters('licenseType')]",
+        "localAdministrator": "[parameters('localAdministrator')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DevCenter/projects', parameters('projectName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "devEnvironmentManagedId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of the system-managed identity for the dev environment."
+      },
+      "value": "[reference(resourceId('Microsoft.DevCenter/projects/environmentTypes', parameters('projectName'), 'dev'), '2023-04-01', 'full').identity.principalId]"
+    }
+  }
+}

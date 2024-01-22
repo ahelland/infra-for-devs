@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.24.24.22086",
+      "templateHash": "9404489890317036750"
+    },
+    "name": "Dev Box Network Connection",
+    "description": "Dev Box Network Connection",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for resources."
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "connectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Network Connection"
+      }
+    },
+    "snetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet for network connection."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DevCenter/networkConnections",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[parameters('connectionName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "domainJoinType": "AzureADJoin",
+        "subnetId": "[parameters('snetId')]",
+        "domainName": "",
+        "organizationUnit": "",
+        "domainUsername": "",
+        "networkingResourceGroupName": "[format('NI_{0}_westeurope', parameters('connectionName'))]"
+      }
+    }
+  ],
+  "outputs": {
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of network connection."
+      },
+      "value": "[resourceId('Microsoft.DevCenter/networkConnections', parameters('connectionName'))]"
+    },
+    "connectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of network connection."
+      },
+      "value": "[parameters('connectionName')]"
+    }
+  }
+}
