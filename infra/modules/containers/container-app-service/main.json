@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.24.24.22086",
+      "templateHash": "3084504074608692895"
+    },
+    "name": "Container App Service",
+    "description": "Container App Service",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Specifies the location for resources."
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "serviceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the service-"
+      }
+    },
+    "serviceType": {
+      "type": "string",
+      "allowedValues": [
+        "redis",
+        "postgres"
+      ],
+      "metadata": {
+        "description": "Type of service."
+      }
+    },
+    "containerAppEnvironmentId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of container environment to deploy to."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-04-01-preview",
+      "name": "[parameters('serviceName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "environmentId": "[parameters('containerAppEnvironmentId')]",
+        "configuration": {
+          "service": {
+            "type": "[parameters('serviceType')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "The id of the service."
+      },
+      "value": "[resourceId('Microsoft.App/containerApps', parameters('serviceName'))]"
+    }
+  }
+}

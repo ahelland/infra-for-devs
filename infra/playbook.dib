@@ -1,6 +1,6 @@
 #!meta
 
-{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
 
 #!markdown
 
@@ -44,3 +44,18 @@ az stack sub create --name eshop-devCenter --location westeurope --template-file
 
 # A deployment stack
 az stack sub create --name eshop-level-3 --location westeurope --template-file .\level-3\main.bicep --parameters .\level-3\main.bicepparam --deny-settings-mode none
+
+#!markdown
+
+### Level-4
+
+#!pwsh
+
+# A what-if to point out errors not caught by the linter
+# az deployment sub what-if --location westeurope --name level-4 --template-file .\level-4\main.bicep --parameters .\level-4\main.bicepparam
+
+# A stand-alone deployment
+# az deployment sub create  --location westeurope --name eshop-level-4 --template-file .\level-4\main.bicep --parameters .\level-4\main.bicepparam
+
+# A deployment stack
+az stack sub create --name eshop-level-4 --location westeurope --template-file .\level-4\main.bicep --parameters .\level-4\main.bicepparam --deny-settings-mode none
