@@ -19,17 +19,17 @@ param containerAppEnvironmentId string
 
 resource containerService 'Microsoft.App/containerApps@2023-04-01-preview' = {
   name: serviceName
-    location: location
-    tags: resourceTags
-    properties: {
-      environmentId: containerAppEnvironmentId
-      configuration: {
-        service: {
-            type: serviceType
-        }
+  location: location
+  tags: resourceTags
+  properties: {
+    environmentId: containerAppEnvironmentId
+    configuration: {
+      service: {
+          type: serviceType
       }
     }
   }
+}
 
 @description('The id of the service.')
 output id string = containerService.id
