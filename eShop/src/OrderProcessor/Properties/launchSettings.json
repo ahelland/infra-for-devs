@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "OrderProcessor": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:16888"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
